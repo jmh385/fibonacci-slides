@@ -2,7 +2,7 @@ from collections.abc import Callable
 
 from pptx import Presentation
 
-from slides import memoization, person, problem, recurrence, recursion, title
+from slides import binet, iterative, memoization, overview, person, problem, recurrence, recursion, title
 
 SlideBuilder = Callable[[Presentation], None]
 
@@ -14,4 +14,7 @@ SLIDES: list[SlideBuilder] = [
     recurrence.build,
     recursion.build,
     memoization.build,
+    iterative.build,
+    binet.build,
+    overview.build,
 ]

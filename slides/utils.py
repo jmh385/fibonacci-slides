@@ -1,5 +1,5 @@
 from lxml.etree import QName
-from PIL import ImageFont
+from PIL import ImageDraw, ImageFont
 from pptx.oxml.ns import qn
 from pptx.oxml.text import CT_TextParagraphProperties
 from pptx.oxml.xmlchemy import OxmlElement
@@ -12,6 +12,34 @@ def gif_font(size: int) -> ImageFont.FreeTypeFont | ImageFont.ImageFont:
         return ImageFont.truetype(r"C:\Windows\Fonts\arial.ttf", size)
     except OSError:
         return ImageFont.load_default()
+
+
+def draw_fraction(
+    draw: ImageDraw.ImageDraw,
+    x: float,
+    y_top: float,
+    num: str,
+    den: str,
+    font: ImageFont.FreeTypeFont | ImageFont.ImageFont,
+    color: tuple[int, int, int] = (31, 31, 31),
+    pad: int = 14,
+    rule: int = 4,
+) -> tuple[float, float]:
+    """Draw num over a full-width division line over den, starting at left x.
+
+    Returns (width, total height). The rule spans the wider of the two parts.
+    """
+    nb = draw.textbbox((0, 0), num, font=font)
+    db = draw.textbbox((0, 0), den, font=font)
+    width = max(nb[2] - nb[0], db[2] - db[0])
+    cx = x + width / 2
+    num_h = nb[3] - nb[1]
+    draw.text((cx, y_top), num, font=font, fill=color, anchor="ma")
+    line_y = y_top + num_h + pad
+    draw.line([(x, line_y), (x + width, line_y)], fill=color, width=rule)
+    den_h = db[3] - db[1]
+    draw.text((cx, line_y + 10), den, font=font, fill=color, anchor="ma")
+    return width, (line_y + 10 + den_h) - y_top
 
 
 class SlideText:
